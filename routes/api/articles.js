@@ -42,6 +42,18 @@ route.post('/:slug/favourite', userFromToken, async(req, res) => {
     res.send(article)
 })
 
+// //DELETE an article /api/articles/:slug
+route.delete('/:slug', userFromToken, async(req, res) => {
+
+    const article = await Articles.findOne({
+        where: {
+            slug: req.params.slug
+        }
+    })
+
+    await article.destroy()
+})
+
 //DELETE /api/articles/:slug/favourite
 
 route.delete('/:slug/favourite', userFromToken, async(req, res) => {
@@ -60,4 +72,5 @@ route.delete('/:slug/favourite', userFromToken, async(req, res) => {
     await article.save()
     res.send(article)
 })
+
 module.exports = { route }
