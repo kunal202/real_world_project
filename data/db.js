@@ -60,8 +60,8 @@ const Articles = db.define('article', {
 Articles.belongsTo(Users, { as: 'author' })
 Users.hasMany(Articles, { as: 'author' })
 
-Articles.belongsToMany(Users, { through: 'favourites' })
-Users.belongsToMany(Articles, { through: 'favourites' })
+// Articles.belongsToMany(Users, { through: 'favourites' })
+// Users.belongsToMany(Articles, { through: 'favourites' })
 
 module.exports = {
     db,

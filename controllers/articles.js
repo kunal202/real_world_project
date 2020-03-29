@@ -31,13 +31,13 @@ async function createArticle(title, description, body, authorUsername, favourite
     }
 
     const newArticle = await Articles.create({
+        slug: slugify(title),
         title,
         description,
         body,
         authorUsername,
         favourited,
-        favouritesCount,
-        slug: slugify(title)
+        favouritesCount
     })
 
     const article = await Articles.findOne({

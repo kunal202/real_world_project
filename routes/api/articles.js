@@ -1,6 +1,7 @@
 const { Router } = require('express')
 const { userFromToken } = require('../../middlewares/auth')
 const { getAllArticles, createArticle } = require('../../controllers/articles')
+const { Articles, Users } = require('../../data/db')
 const { FindUserByToken } = require('../../controllers/articles')
 
 const route = Router()
@@ -20,8 +21,6 @@ route.post('/', userFromToken, async(req, res) => {
         a.title,
         a.description,
         a.body,
-        a.favourited,
-        a.favouritsCount,
         req.user.username
     )
     res.send(article)
@@ -30,16 +29,32 @@ route.post('/', userFromToken, async(req, res) => {
 // // POST /api/articles/:slug/favourite
 route.post('/:slug/favourite', userFromToken, async(req, res) => {
 
-    const article = await getAllArticles.findOne({
+    const article = await Articles.findOne({
         where: {
-            slug
+            slug: req.params.slug
         }
     })
 
     article.favourited = true
-    article.favouritsCount++
+    article.favouritesCount = article.favouritesCount + 1
 
-        res.send(article)
+    res.send(article)
 })
 
+//DELETE /api/articles/:slug/favourite
+
+route.delete('/:slug/favourite', userFromToken, async(req, res) => {
+
+    const article = await Articles.findOne({
+        where: {
+            slug: req.params.slug
+        }
+    })
+
+    article.favourited = false
+    if (article.favouritesCount != 0) {
+        article.favouritesCount = article.favouritesCount - 1
+    }
+    res.send(article)
+})
 module.exports = { route }
