@@ -38,6 +38,7 @@ route.post('/:slug/favourite', userFromToken, async(req, res) => {
     article.favourited = true
     article.favouritesCount = article.favouritesCount + 1
 
+    await article.save()
     res.send(article)
 })
 
@@ -55,6 +56,8 @@ route.delete('/:slug/favourite', userFromToken, async(req, res) => {
     if (article.favouritesCount != 0) {
         article.favouritesCount = article.favouritesCount - 1
     }
+
+    await article.save()
     res.send(article)
 })
 module.exports = { route }
