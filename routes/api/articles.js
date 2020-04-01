@@ -3,7 +3,7 @@ const { userFromToken } = require('../../middlewares/auth')
 const { getAllArticles, createArticle } = require('../../controllers/articles')
 const { Articles, Users } = require('../../data/db')
 const { FindUserByToken } = require('../../controllers/articles')
-
+const { slugify } = require('../../utils/string')
 const route = Router()
 
 // GET /api/articles
@@ -26,8 +26,8 @@ route.post('/', userFromToken, async(req, res) => {
     res.send(article)
 })
 
-// // POST /api/articles/:slug/favourite
-route.post('/:slug/favourite', userFromToken, async(req, res) => {
+//UPDATE an article /api/articles/:slug
+route.put('/:slug', userFromToken, async(req, res) => {
 
     const article = await Articles.findOne({
         where: {
@@ -35,9 +35,20 @@ route.post('/:slug/favourite', userFromToken, async(req, res) => {
         }
     })
 
-    article.favourited = true
-    article.favouritesCount = article.favouritesCount + 1
+    if (!article) {
+        res.status(404).send({
+            errors: {
+                body: ['Invalid Path']
+            }
+        })
+    }
 
+    let a = req.body.article
+
+    article.slug = a.title.toLowerCase().split(' ').join('-')
+    article.title = a.title
+    article.description = a.description
+    article.body = a.body
     await article.save()
     res.send(article)
 })
@@ -54,8 +65,24 @@ route.delete('/:slug', userFromToken, async(req, res) => {
     await article.destroy()
 })
 
-//DELETE /api/articles/:slug/favourite
+// POST /api/articles/:slug/favourite
+route.post('/:slug/favourite', userFromToken, async(req, res) => {
 
+    const article = await Articles.findOne({
+        where: {
+            slug: req.params.slug
+        }
+    })
+
+    article.favourited = true
+    article.favouritesCount = article.favouritesCount + 1
+
+    await article.save()
+    res.send(article)
+})
+
+//DELETE /api/articles/:slug/favourite
+// unfavourite
 route.delete('/:slug/favourite', userFromToken, async(req, res) => {
 
     const article = await Articles.findOne({
